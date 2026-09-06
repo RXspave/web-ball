@@ -1,0 +1,3557 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ball Battle V5</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    user-select:none;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(circle at 20% 10%,#ffffff 0,#eef7ff 35%,transparent 60%),
+        linear-gradient(135deg,#dff3ff,#f8fbff 45%,#e9e4ff);
+    color:#172033;
+    min-height:100vh;
+}
+
+button{
+    font-family:inherit;
+}
+
+.header{
+    height:72px;
+    padding:12px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:rgba(255,255,255,.88);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid #dbe7f3;
+    box-shadow:0 4px 20px #7890aa22;
+    position:sticky;
+    top:0;
+    z-index:50;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:900;
+    color:#526cff;
+}
+
+.logo span{
+    color:#ff4d87;
+}
+
+.money{
+    display:flex;
+    gap:10px;
+}
+
+.moneyBox{
+    padding:9px 14px;
+    border-radius:14px;
+    background:#fff;
+    box-shadow:0 4px 15px #5c75951c;
+    font-weight:bold;
+}
+
+.app{
+    max-width:1250px;
+    margin:auto;
+    padding:22px;
+}
+
+.nav{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+.nav button{
+    border:0;
+    background:#fff;
+    padding:12px 18px;
+    border-radius:14px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 4px 15px #58718d20;
+    transition:.2s;
+}
+
+.nav button:hover{
+    transform:translateY(-2px);
+}
+
+.nav button.active{
+    color:#fff;
+    background:linear-gradient(135deg,#5a6cff,#7c54ff);
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.panel{
+    background:rgba(255,255,255,.92);
+    border:1px solid #dce8f5;
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 10px 35px #49658318;
+    margin-bottom:20px;
+}
+
+h1,h2,h3{
+    margin-top:0;
+}
+
+.modeGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:18px;
+}
+
+.modeCard{
+    border:2px solid transparent;
+    border-radius:24px;
+    padding:20px;
+    background:linear-gradient(145deg,#fff,#edf6ff);
+    cursor:pointer;
+    box-shadow:0 10px 25px #57718b20;
+    transition:.25s;
+    min-height:180px;
+}
+
+.modeCard:hover{
+    transform:translateY(-5px) scale(1.01);
+    border-color:#7181ff;
+}
+
+.modeIcon{
+    font-size:55px;
+    margin-bottom:10px;
+}
+
+.modeCard h3{
+    margin:5px 0;
+}
+
+.modeCard p{
+    color:#657287;
+}
+
+.ballGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:15px;
+}
+
+.ballCard{
+    position:relative;
+    border:2px solid #e0e9f4;
+    background:#fff;
+    border-radius:20px;
+    padding:15px;
+    cursor:pointer;
+    text-align:center;
+    transition:.2s;
+    overflow:hidden;
+}
+
+.ballCard:hover{
+    transform:translateY(-4px);
+    box-shadow:0 10px 25px #57718b25;
+}
+
+.ballCard.selected{
+    border-color:#6272ff;
+    box-shadow:0 0 0 4px #6272ff22;
+}
+
+.ballCard.locked{
+    filter:grayscale(.7);
+    opacity:.65;
+}
+
+.ballPreview{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    margin:3px auto 12px;
+    box-shadow:
+        inset -13px -13px 22px #0004,
+        inset 10px 10px 15px #fff8,
+        0 8px 18px #33415544;
+    position:relative;
+}
+
+.ballPreview:after{
+    content:"";
+    position:absolute;
+    width:24px;
+    height:12px;
+    border-radius:50%;
+    background:#fff9;
+    left:19px;
+    top:17px;
+    transform:rotate(-25deg);
+}
+
+.weaponMini{
+    position:absolute;
+    font-size:22px;
+    right:-5px;
+    bottom:4px;
+}
+
+.ballName{
+    font-weight:900;
+    font-size:17px;
+}
+
+.ballStats{
+    font-size:12px;
+    color:#697589;
+    margin-top:5px;
+}
+
+.lockText{
+    margin-top:8px;
+    font-size:12px;
+    font-weight:bold;
+    color:#e14b70;
+}
+
+.bigBtn{
+    border:0;
+    border-radius:15px;
+    padding:13px 22px;
+    font-size:16px;
+    font-weight:900;
+    cursor:pointer;
+    color:white;
+    background:linear-gradient(135deg,#596cff,#874cff);
+    box-shadow:0 8px 20px #5d62ff30;
+    margin:5px;
+}
+
+.bigBtn:hover{
+    transform:translateY(-2px);
+}
+
+.secondary{
+    background:#eef3fa;
+    color:#27334a;
+}
+
+.danger{
+    background:linear-gradient(135deg,#ff5577,#ff7655);
+}
+
+.battleWrap{
+    display:flex;
+    gap:18px;
+    align-items:flex-start;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.arenaBox{
+    position:relative;
+    width:min(760px,100%);
+}
+
+canvas{
+    display:block;
+    width:100%;
+    border-radius:22px;
+    background:#eaf7ff;
+    border:6px solid #91a9c2;
+    box-shadow:0 12px 35px #31465c35;
+}
+
+.cooldowns{
+    width:220px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.cdCard{
+    background:#fff;
+    border-radius:15px;
+    padding:12px;
+    box-shadow:0 6px 20px #48617b1c;
+}
+
+.cdTitle{
+    font-weight:bold;
+    margin-bottom:7px;
+}
+
+.bar{
+    height:9px;
+    background:#e8edf4;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.barFill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#6875ff,#b15cff);
+    transition:.05s linear;
+}
+
+.cdText{
+    margin-top:5px;
+    font-size:12px;
+    color:#687387;
+}
+
+.result{
+    text-align:center;
+    font-size:24px;
+    font-weight:900;
+    margin:15px;
+}
+
+.rankBox{
+    text-align:center;
+    background:linear-gradient(135deg,#fff,#f1f6ff);
+    padding:25px;
+    border-radius:25px;
+    margin-bottom:20px;
+}
+
+.rankName{
+    font-size:34px;
+    font-weight:1000;
+}
+
+.stars{
+    font-size:35px;
+    letter-spacing:5px;
+    margin:8px;
+}
+
+.rankProgress{
+    max-width:450px;
+    height:13px;
+    background:#dfe7f1;
+    border-radius:20px;
+    margin:15px auto;
+    overflow:hidden;
+}
+
+.rankProgress div{
+    height:100%;
+    background:linear-gradient(90deg,#ffca28,#ff7b4d);
+}
+
+.adminPanel{
+    display:none;
+    background:linear-gradient(135deg,#27144b,#45208a);
+    color:white;
+    border-radius:22px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.adminPanel.show{
+    display:block;
+}
+
+input,select{
+    padding:11px 13px;
+    border-radius:12px;
+    border:1px solid #d3deea;
+    outline:none;
+    background:#fff;
+    margin:4px;
+}
+
+.musicInfo{
+    background:#f1f6ff;
+    border-radius:15px;
+    padding:14px;
+    margin-top:10px;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.small{
+    font-size:13px;
+    color:#687589;
+}
+
+@media(max-width:700px){
+    .app{
+        padding:12px;
+    }
+
+    .header{
+        padding:10px;
+    }
+
+    .logo{
+        font-size:19px;
+    }
+
+    .moneyBox{
+        padding:7px 9px;
+        font-size:12px;
+    }
+
+    .cooldowns{
+        width:100%;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="logo">BALL <span>BATTLE</span> V5</div>
+
+    <div class="money">
+        <div class="moneyBox">🪙 <span id="coins">100</span></div>
+        <div class="moneyBox">💎 <span id="diamonds">0</span></div>
+    </div>
+</header>
+
+<div class="app">
+
+<div class="nav">
+    <button class="active" onclick="showPage('home',this)">🏠 Home</button>
+    <button onclick="showPage('battle',this)">⚔️ Battle</button>
+    <button onclick="showPage('ranked',this)">🏆 Ranked</button>
+    <button onclick="showPage('shop',this)">🛒 Shop</button>
+    <button onclick="showPage('collection',this)">🎯 Collection</button>
+    <button onclick="showPage('settings',this)">⚙️ Settings</button>
+</div>
+
+<!-- ADMIN -->
+<div id="adminPanel" class="adminPanel">
+    <h2>👑 DEVELOPER MODE</h2>
+
+    <div>
+        <input id="adminCoins" type="number" placeholder="Coins">
+        <input id="adminDiamonds" type="number" placeholder="Diamonds">
+        <button class="bigBtn" onclick="applyAdmin()">Terapkan</button>
+        <button class="bigBtn danger" onclick="backNormal()">B3CK</button>
+    </div>
+
+    <p>
+        Semua bola terbuka. Brown Ball 🤎 tersedia hanya dalam Developer Mode.
+    </p>
+</div>
+
+<!-- HOME -->
+<section id="home" class="page active">
+
+<div class="panel">
+    <h1>⚔️ Ball Battle V5</h1>
+    <p>
+        Pilih mode dan gunakan bola milikmu untuk bertarung.
+        Semua pertandingan menggunakan physics arena.
+    </p>
+</div>
+
+<div class="modeGrid">
+
+    <div class="modeCard" onclick="openBattle('predict')">
+        <div class="modeIcon">🔮</div>
+        <h3>Predict Battle</h3>
+        <p>Prediksi bola mana yang akan menang.</p>
+    </div>
+
+    <div class="modeCard" onclick="openBattle('custom')">
+        <div class="modeIcon">⚔️</div>
+        <h3>Custom Battle</h3>
+        <p>Pilih dua bola sendiri dan lihat pertarungannya.</p>
+    </div>
+
+    <div class="modeCard" onclick="openBattle('pvp')">
+        <div class="modeIcon">👥</div>
+        <h3>PvP</h3>
+        <p>Mode pertandingan dengan kode lobby.</p>
+    </div>
+
+    <div class="modeCard" onclick="openBattle('ranked')">
+        <div class="modeIcon">🏆</div>
+        <h3>Ranked</h3>
+        <p>Melawan bot random untuk mendapatkan bintang.</p>
+    </div>
+
+</div>
+
+</section>
+
+<!-- BATTLE -->
+<section id="battle" class="page">
+
+<div class="panel">
+    <h2 id="battleTitle">⚔️ Pilih Bola</h2>
+    <p class="small">
+        Klik gambar bola untuk memilihnya.
+    </p>
+
+    <div id="ballSelection" class="ballGrid"></div>
+
+    <div id="secondSelection" class="hidden">
+        <hr>
+        <h3>🔵 Pilih bola kedua</h3>
+        <div id="ballSelection2" class="ballGrid"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:20px">
+        <button class="bigBtn" onclick="startSelectedBattle()">
+            ⚔️ MULAI BATTLE
+        </button>
+        <button class="bigBtn secondary" onclick="showPage('home')">
+            ← Kembali
+        </button>
+    </div>
+</div>
+
+<div id="battleArea" class="panel hidden">
+
+    <div class="battleWrap">
+
+        <div class="arenaBox">
+            <canvas id="arena" width="760" height="430"></canvas>
+        </div>
+
+        <div class="cooldowns" id="cooldowns"></div>
+
+    </div>
+
+    <div id="result" class="result"></div>
+
+    <div style="text-align:center">
+        <button class="bigBtn" onclick="stopBattle()">
+            🏁 Selesai
+        </button>
+    </div>
+
+</div>
+
+</section>
+
+<!-- RANKED -->
+<section id="ranked" class="page">
+
+<div class="panel">
+
+    <div class="rankBox">
+
+        <div style="font-size:50px">🏆</div>
+
+        <div class="rankName" id="rankName">
+            Bronze 1
+        </div>
+
+        <div class="stars" id="rankStars">
+            ☆☆☆
+        </div>
+
+        <div class="rankProgress">
+            <div id="rankProgress"></div>
+        </div>
+
+        <p id="rankInfo"></p>
+
+    </div>
+
+    <h2>Ranked Battle</h2>
+
+    <p>
+        Lawan bot random. Menang mendapatkan ⭐.
+        Di Bronze kekalahan tidak mengurangi bintang.
+        Mulai Silver, kekalahan mengurangi ⭐.
+    </p>
+
+    <div style="text-align:center">
+        <button class="bigBtn" onclick="openBattle('ranked')">
+            🏆 CARI MATCH
+        </button>
+    </div>
+
+</div>
+
+<div class="panel">
+    <h2>📊 Urutan Rank</h2>
+
+    <p>🥉 Bronze 1 → Bronze 2 → Bronze 3</p>
+    <p>🥈 Silver 1 → Silver 2 → Silver 3 → Silver 4</p>
+    <p>🥇 Gold 1 → Gold 2 → Gold 3 → Gold 4</p>
+    <p>👑 Royale 1 → Royale 999</p>
+
+</div>
+
+</section>
+
+<!-- SHOP -->
+<section id="shop" class="page">
+
+<div class="panel">
+    <h2>🛒 Ball Shop</h2>
+    <div id="shopGrid" class="ballGrid"></div>
+</div>
+
+</section>
+
+<!-- COLLECTION -->
+<section id="collection" class="page">
+
+<div class="panel">
+    <h2>🎯 Collection</h2>
+    <div id="collectionGrid" class="ballGrid"></div>
+</div>
+
+</section>
+
+<!-- SETTINGS -->
+<section id="settings" class="page">
+
+<div class="panel">
+
+    <h2>🎵 Music</h2>
+
+    <p>
+        Kamu bisa mengganti backsound dengan file musik milikmu sendiri.
+    </p>
+
+    <div class="musicInfo">
+
+<pre>
+// ===============================================
+// 🎵 GANTI MUSIK DI KODE JAVASCRIPT
+// ===============================================
+
+const MENU_MUSIC = "MENU.mp3";
+const BATTLE_MUSIC = "ISI DI SINI LAGU FILE";
+</pre>
+
+    </div>
+
+    <p class="small">
+        Contoh jika file bernama menu.mp3 dan battle.mp3:
+    </p>
+
+<pre>
+const MENU_MUSIC = MENU.mp3;
+const BATTLE_MUSIC = FIGHT.mp3;
+</pre>
+
+    <button class="bigBtn" onclick="toggleMusic()">
+        🎵 Musik ON/OFF
+    </button>
+
+    <button class="bigBtn secondary" onclick="soundTest()">
+        🔊 Tes Suara
+    </button>
+
+</div>
+
+<div class="panel">
+
+    <h2>🔐 Developer Mode</h2>
+
+    <p>
+        Ketik kode:
+    </p>
+
+    <pre>4DM1N</pre>
+
+    <p>
+        Untuk keluar:
+    </p>
+
+    <pre>B3CK</pre>
+
+</div>
+
+</section>
+
+</div>
+
+<script>
+/* =========================================================
+   BALL BATTLE V5
+========================================================= */
+
+
+/* =========================================================
+   🎵 BACKSOUND
+   GANTI BAGIAN INI
+========================================================= */
+
+const MENU_MUSIC = "MENU.mp3";
+const BATTLE_MUSIC = "ISI DI SINI LAGU FILE";
+
+const MENU_VOLUME = 0.35;
+const BATTLE_VOLUME = 0.30;
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+let menuAudio = null;
+let battleAudio = null;
+let musicEnabled = true;
+let audioStarted = false;
+
+function initMusic(){
+
+    if(audioStarted) return;
+
+    audioStarted = true;
+
+    if(MENU_MUSIC !== "MENU.mp3"){
+        menuAudio = new Audio(MENU_MUSIC);
+        menuAudio.loop = true;
+        menuAudio.volume = MENU_VOLUME;
+    }
+
+    if(BATTLE_MUSIC !== "ISI DI SINI LAGU FILE"){
+        battleAudio = new Audio(BATTLE_MUSIC);
+        battleAudio.loop = true;
+        battleAudio.volume = BATTLE_VOLUME;
+    }
+
+    playMenuMusic();
+}
+
+function playMenuMusic(){
+
+    if(!musicEnabled) return;
+
+    if(battleAudio){
+        battleAudio.pause();
+        battleAudio.currentTime = 0;
+    }
+
+    if(menuAudio){
+        menuAudio.play().catch(()=>{});
+    }
+}
+
+function playBattleMusic(){
+
+    if(!musicEnabled) return;
+
+    if(menuAudio){
+        menuAudio.pause();
+        menuAudio.currentTime = 0;
+    }
+
+    if(battleAudio){
+        battleAudio.play().catch(()=>{});
+    }
+}
+
+function toggleMusic(){
+
+    musicEnabled = !musicEnabled;
+
+    if(!musicEnabled){
+
+        if(menuAudio) menuAudio.pause();
+        if(battleAudio) battleAudio.pause();
+
+    }else{
+
+        if(gameRunning) playBattleMusic();
+        else playMenuMusic();
+
+    }
+}
+
+
+/* =========================================================
+   SOUND EFFECTS
+========================================================= */
+
+let audioCtx = null;
+
+function ensureAudio(){
+
+    if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    if(audioCtx.state === "suspended"){
+        audioCtx.resume();
+    }
+}
+
+function tone(freq,duration,type="sine",volume=.15){
+
+    ensureAudio();
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = type;
+    osc.frequency.value = freq;
+
+    gain.gain.setValueAtTime(volume,audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        audioCtx.currentTime + duration
+    );
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+function collisionSound(){
+    tone(105,.11,"square",.28);
+    setTimeout(()=>tone(65,.08,"sine",.18),25);
+}
+
+function wallSound(){
+    tone(180,.055,"triangle",.07);
+}
+
+function winSound(){
+    tone(500,.15,"sine",.18);
+    setTimeout(()=>tone(700,.2,"sine",.2),130);
+    setTimeout(()=>tone(950,.3,"sine",.22),280);
+}
+
+function loseSound(){
+    tone(250,.2,"sawtooth",.15);
+    setTimeout(()=>tone(150,.35,"sawtooth",.12),180);
+}
+
+function drawSound(){
+    tone(350,.2,"triangle",.15);
+}
+
+function soundTest(){
+    collisionSound();
+    setTimeout(wallSound,150);
+}
+
+
+/* =========================================================
+   DATA
+========================================================= */
+
+const BASE_BALLS = [
+
+{
+id:1,
+name:"Ruby",
+color:"#e52f48",
+weapon:"⚔️",
+strength:75,
+hp:1000,
+speed:4.1,
+cooldown:700,
+skill:"Inferno Slash",
+skill2:"",
+price:0,
+diamond:0
+},
+
+{
+id:2,
+name:"Azure",
+color:"#2787ff",
+weapon:"🔱",
+strength:70,
+hp:1050,
+speed:4.4,
+cooldown:900,
+skill:"Flash Dash",
+skill2:"Ocean Parry",
+price:0,
+diamond:0
+},
+
+{
+id:3,
+name:"Emerald",
+color:"#22b66f",
+weapon:"🛡️",
+strength:62,
+hp:1250,
+speed:3.5,
+cooldown:950,
+skill:"Pure Feal",
+skill2:"",
+price:0,
+diamond:0
+},
+
+{
+id:4,
+name:"Violet",
+color:"#8c4cff",
+weapon:"☠️",
+strength:82,
+hp:950,
+speed:4.0,
+cooldown:1300,
+skill:"God Reaper",
+skill2:"",
+price:500,
+diamond:30
+},
+
+{
+id:5,
+name:"Gold",
+color:"#f5b82e",
+weapon:"🔨",
+strength:88,
+hp:1350,
+speed:3.2,
+cooldown:1500,
+skill:"Holy One Sun",
+skill2:"",
+price:750,
+diamond:50
+},
+
+{
+id:6,
+name:"Cyan",
+color:"#19dce6",
+weapon:"🏹",
+strength:60,
+hp:900,
+speed:4.8,
+cooldown:800,
+skill:"Vanishing Heart",
+skill2:"",
+price:850,
+diamond:60
+},
+
+{
+id:7,
+name:"Crimson",
+color:"#9d1728",
+weapon:"⚔️",
+strength:105,
+hp:850,
+speed:4.5,
+cooldown:1700,
+skill:"Four Hidden Mechanic",
+skill2:"",
+price:1000,
+diamond:75
+},
+
+{
+id:8,
+name:"White",
+color:"#f7f9ff",
+weapon:"🛡️",
+strength:58,
+hp:1450,
+speed:3.1,
+cooldown:1700,
+skill:"Pure Field",
+skill2:"",
+price:1200,
+diamond:90
+},
+
+{
+id:9,
+name:"Black",
+color:"#151722",
+weapon:"🗡️",
+strength:100,
+hp:1050,
+speed:4.0,
+cooldown:3000,
+skill:"Time Knull",
+skill2:"",
+price:1500,
+diamond:120
+},
+
+{
+id:10,
+name:"Orange",
+color:"#ff7c22",
+weapon:"🔮",
+strength:92,
+hp:1100,
+speed:3.7,
+cooldown:2500,
+skill:"Helt Meteor",
+skill2:"",
+price:1800,
+diamond:140
+},
+
+{
+id:11,
+name:"Rainbow",
+color:"rainbow",
+weapon:"⭕",
+strength:65,
+hp:1200,
+speed:3.8,
+cooldown:8000,
+skill:"Rainbow Summon",
+skill2:"Trapesium Glaze",
+price:2500,
+diamond:200
+},
+
+{
+id:12,
+name:"Brown",
+color:"#874b25",
+weapon:"🔫",
+strength:72,
+hp:1150,
+speed:4.2,
+cooldown:900,
+skill:"Blazing Age",
+skill2:"Mega Boom",
+price:0,
+diamond:0,
+admin:true
+}
+
+];
+
+let balls = structuredClone(BASE_BALLS);
+
+let owned = [1,2,3];
+
+let coins = 100;
+let diamonds = 0;
+
+let developerMode = false;
+
+let selectedBall = 1;
+let selectedBall2 = 2;
+
+let currentMode = "predict";
+
+let gameRunning = false;
+
+let fighterA = null;
+let fighterB = null;
+
+let particles = [];
+let projectiles = [];
+let minions = [];
+
+let shake = 0;
+
+let lastTime = 0;
+
+
+/* =========================================================
+   RANK SYSTEM
+========================================================= */
+
+const rankList = [];
+
+for(let i=1;i<=3;i++){
+    rankList.push({
+        name:`Bronze ${i}`,
+        tier:"Bronze"
+    });
+}
+
+for(let i=1;i<=4;i++){
+    rankList.push({
+        name:`Silver ${i}`,
+        tier:"Silver"
+    });
+}
+
+for(let i=1;i<=4;i++){
+    rankList.push({
+        name:`Gold ${i}`,
+        tier:"Gold"
+    });
+}
+
+for(let i=1;i<=999;i++){
+    rankList.push({
+        name:`Royale ${i}`,
+        tier:"Royale"
+    });
+}
+
+let rankIndex = Number(localStorage.getItem("bb_rankIndex") || 0);
+let rankStars = Number(localStorage.getItem("bb_rankStars") || 0);
+
+rankIndex = Math.max(0,Math.min(rankList.length-1,rankIndex));
+rankStars = Math.max(0,Math.min(2,rankStars));
+
+
+function saveRank(){
+
+    localStorage.setItem("bb_rankIndex",rankIndex);
+    localStorage.setItem("bb_rankStars",rankStars);
+
+    updateRankUI();
+}
+
+function updateRankUI(){
+
+    const rank = rankList[rankIndex];
+
+    document.getElementById("rankName").textContent = rank.name;
+
+    let stars = "";
+
+    for(let i=0;i<3;i++){
+        stars += i < rankStars ? "⭐" : "☆";
+    }
+
+    document.getElementById("rankStars").textContent = stars;
+
+    document.getElementById("rankProgress").style.width =
+        `${((rankStars)/3)*100}%`;
+
+    if(rank.tier === "Bronze"){
+        document.getElementById("rankInfo").textContent =
+            "Kalah tidak mengurangi bintang di Bronze.";
+    }else{
+        document.getElementById("rankInfo").textContent =
+            "Kalah akan mengurangi 1 bintang.";
+    }
+}
+
+function rankedWin(){
+
+    rankStars++;
+
+    if(rankStars >= 3){
+
+        rankStars = 0;
+
+        if(rankIndex < rankList.length-1){
+            rankIndex++;
+        }
+    }
+
+    saveRank();
+}
+
+function rankedLose(){
+
+    const tier = rankList[rankIndex].tier;
+
+    if(tier === "Bronze"){
+        saveRank();
+        return;
+    }
+
+    rankStars--;
+
+    if(rankStars < 0){
+
+        if(rankIndex > 0){
+            rankIndex--;
+            rankStars = 2;
+        }else{
+            rankStars = 0;
+        }
+
+    }
+
+    saveRank();
+}
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+function save(){
+
+    localStorage.setItem("bb_coins",coins);
+    localStorage.setItem("bb_diamonds",diamonds);
+    localStorage.setItem("bb_owned",JSON.stringify(owned));
+}
+
+function load(){
+
+    coins = Number(localStorage.getItem("bb_coins") || 100);
+    diamonds = Number(localStorage.getItem("bb_diamonds") || 0);
+
+    try{
+        owned = JSON.parse(
+            localStorage.getItem("bb_owned") || "[1,2,3]"
+        );
+    }catch{
+        owned=[1,2,3];
+    }
+
+    updateMoney();
+}
+
+function updateMoney(){
+
+    document.getElementById("coins").textContent = coins;
+    document.getElementById("diamonds").textContent = diamonds;
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+function showPage(id,button){
+
+    document.querySelectorAll(".page").forEach(p=>{
+        p.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+
+    document.querySelectorAll(".nav button").forEach(b=>{
+        b.classList.remove("active");
+    });
+
+    if(button) button.classList.add("active");
+
+    if(id !== "battle" && !gameRunning){
+        playMenuMusic();
+    }
+
+    if(id === "ranked"){
+        updateRankUI();
+    }
+}
+
+
+/* =========================================================
+   BALL VISUAL
+========================================================= */
+
+function ballGradient(ball){
+
+    if(ball.color === "rainbow"){
+        return "conic-gradient(#ff3b3b,#ffd93d,#42e66b,#31d7ff,#675cff,#ff43c8,#ff3b3b)";
+    }
+
+    return ball.color;
+}
+
+
+/* =========================================================
+   BALL CARDS
+========================================================= */
+
+function renderBallCards(){
+
+    const grid = document.getElementById("ballSelection");
+
+    grid.innerHTML = "";
+
+    balls.forEach(ball=>{
+
+        if(ball.admin && !developerMode) return;
+
+        const isOwned = owned.includes(ball.id);
+
+        const card = document.createElement("div");
+
+        card.className =
+            "ballCard " +
+            (selectedBall === ball.id ? "selected " : "") +
+            (!isOwned ? "locked" : "");
+
+        card.innerHTML = `
+
+            <div class="ballPreview"
+                style="background:${ballGradient(ball)}">
+
+                <span class="weaponMini">${ball.weapon}</span>
+
+            </div>
+
+            <div class="ballName">
+                ${ball.name}
+            </div>
+
+            <div class="ballStats">
+                ❤️ ${ball.hp}<br>
+                ⚔️ ${ball.strength}<br>
+                ${ball.weapon}
+            </div>
+
+            ${
+                !isOwned
+                ?
+                `<div class="lockText">
+                    🔒 ${ball.price} 🪙 + ${ball.diamond} 💎
+                </div>`
+                :
+                `<div class="small">
+                    ${ball.skill}
+                </div>`
+            }
+
+        `;
+
+        card.onclick = ()=>{
+
+            if(!isOwned){
+                alert("Bola ini belum kamu miliki.");
+                return;
+            }
+
+            selectedBall = ball.id;
+
+            renderBallCards();
+            renderSecondCards();
+
+        };
+
+        grid.appendChild(card);
+
+    });
+
+    renderSecondCards();
+}
+
+function renderSecondCards(){
+
+    const box = document.getElementById("secondSelection");
+
+    if(currentMode !== "custom"){
+        box.classList.add("hidden");
+        return;
+    }
+
+    box.classList.remove("hidden");
+
+    const grid = document.getElementById("ballSelection2");
+
+    grid.innerHTML = "";
+
+    balls.forEach(ball=>{
+
+        if(ball.admin && !developerMode) return;
+
+        if(!owned.includes(ball.id)) return;
+
+        const card = document.createElement("div");
+
+        card.className =
+            "ballCard " +
+            (selectedBall2 === ball.id ? "selected" : "");
+
+        card.innerHTML = `
+
+            <div class="ballPreview"
+                 style="background:${ballGradient(ball)}">
+
+                <span class="weaponMini">${ball.weapon}</span>
+
+            </div>
+
+            <div class="ballName">
+                ${ball.name}
+            </div>
+
+            <div class="ballStats">
+                ❤️ ${ball.hp}<br>
+                ⚔️ ${ball.strength}
+            </div>
+        `;
+
+        card.onclick = ()=>{
+            selectedBall2=ball.id;
+            renderSecondCards();
+        };
+
+        grid.appendChild(card);
+
+    });
+}
+
+
+/* =========================================================
+   OPEN BATTLE
+========================================================= */
+
+function openBattle(mode){
+
+    currentMode = mode;
+
+    showPage("battle");
+
+    document.getElementById("battleArea").classList.add("hidden");
+
+    document.getElementById("battleTitle").textContent =
+        mode === "predict" ? "🔮 Predict Battle" :
+        mode === "custom" ? "⚔️ Custom Battle" :
+        mode === "ranked" ? "🏆 Ranked Battle" :
+        "👥 PvP Battle";
+
+    renderBallCards();
+
+    document.getElementById("secondSelection").classList.toggle(
+        "hidden",
+        mode !== "custom"
+    );
+
+    if(mode === "ranked"){
+
+        // Bot random dipilih ketika battle dimulai.
+        document.getElementById("battleTitle").textContent =
+            "🏆 Ranked — Pilih Bola Kamu";
+    }
+}
+
+
+/* =========================================================
+   SHOP
+========================================================= */
+
+function renderShop(){
+
+    const grid = document.getElementById("shopGrid");
+
+    grid.innerHTML="";
+
+    balls.forEach(ball=>{
+
+        if(ball.admin) return;
+
+        const isOwned=owned.includes(ball.id);
+
+        const card=document.createElement("div");
+
+        card.className="ballCard";
+
+        card.innerHTML=`
+
+            <div class="ballPreview"
+                 style="background:${ballGradient(ball)}">
+
+                <span class="weaponMini">${ball.weapon}</span>
+
+            </div>
+
+            <div class="ballName">${ball.name}</div>
+
+            <div class="ballStats">
+                ❤️ ${ball.hp}<br>
+                ⚔️ ${ball.strength}
+            </div>
+
+            ${
+                isOwned
+                ? `<button class="bigBtn secondary">✓ Owned</button>`
+                :
+                `<button class="bigBtn"
+                    onclick="buyBall(${ball.id})">
+                    ${ball.price} 🪙
+                    +
+                    ${ball.diamond} 💎
+                </button>`
+            }
+
+        `;
+
+        grid.appendChild(card);
+    });
+}
+
+function buyBall(id){
+
+    const ball=balls.find(x=>x.id===id);
+
+    if(!ball) return;
+
+    if(owned.includes(id)) return;
+
+    if(coins < ball.price){
+        alert("Coins tidak cukup.");
+        return;
+    }
+
+    if(diamonds < ball.diamond){
+        alert("Diamond tidak cukup.");
+        return;
+    }
+
+    coins-=ball.price;
+    diamonds-=ball.diamond;
+
+    owned.push(id);
+
+    save();
+    updateMoney();
+    renderShop();
+    renderBallCards();
+
+    alert(`${ball.name} berhasil dibeli!`);
+}
+
+
+/* =========================================================
+   COLLECTION
+========================================================= */
+
+function renderCollection(){
+
+    const grid=document.getElementById("collectionGrid");
+
+    grid.innerHTML="";
+
+    balls.forEach(ball=>{
+
+        if(ball.admin && !developerMode) return;
+
+        if(!owned.includes(ball.id)) return;
+
+        const card=document.createElement("div");
+
+        card.className="ballCard";
+
+        card.innerHTML=`
+
+            <div class="ballPreview"
+                 style="background:${ballGradient(ball)}">
+
+                <span class="weaponMini">${ball.weapon}</span>
+
+            </div>
+
+            <div class="ballName">${ball.name}</div>
+
+            <div class="ballStats">
+                ❤️ HP ${ball.hp}<br>
+                ⚔️ Power ${ball.strength}<br>
+                ⚡ ${ball.skill}
+                ${
+                    ball.skill2
+                    ? `<br>⚡ ${ball.skill2}`
+                    : ""
+                }
+            </div>
+        `;
+
+        grid.appendChild(card);
+
+    });
+}
+
+
+/* =========================================================
+   FIGHTER
+========================================================= */
+
+function createFighter(ballId,x,y){
+
+    const data=balls.find(x=>x.id===ballId);
+
+    return {
+
+        data,
+
+        x,
+        y,
+
+        vx:(Math.random()>.5?1:-1) * data.speed,
+        vy:(Math.random()>.5?1:-1) * data.speed,
+
+        r:43,
+
+        hp:data.hp,
+        maxHp:data.hp,
+
+        attackTimer:0,
+
+        skill1Timer:0,
+        skill2Timer:0,
+
+        skill1Duration:0,
+        skill2Duration:0,
+
+        stunUntil:0,
+        slowUntil:0,
+
+        invincibleUntil:0,
+
+        parryUntil:0,
+        omniUntil:0,
+        timeStopUntil:0,
+
+        boundUntil:0,
+        accumulatedDamage:0,
+
+        storedVX:0,
+        storedVY:0,
+        stunned:false,
+
+        summons:0,
+
+        burnUntil:0,
+        burnDamage:0,
+
+        arrows:1,
+
+        regenUntil:0,
+        regenRate:0,
+
+        slashUntil:0
+
+    };
+}
+
+
+/* =========================================================
+   ARENA
+========================================================= */
+
+const canvas=document.getElementById("arena");
+const ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
+
+    // Arena tetap menggunakan resolusi internal.
+}
+
+function drawArena(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle="#edfaff";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // grid
+    ctx.strokeStyle="#d5eaf4";
+    ctx.lineWidth=1;
+
+    for(let x=0;x<canvas.width;x+=38){
+
+        ctx.beginPath();
+        ctx.moveTo(x,0);
+        ctx.lineTo(x,canvas.height);
+        ctx.stroke();
+    }
+
+    for(let y=0;y<canvas.height;y+=38){
+
+        ctx.beginPath();
+        ctx.moveTo(0,y);
+        ctx.lineTo(canvas.width,y);
+        ctx.stroke();
+    }
+
+    // border
+    ctx.strokeStyle="#7189a4";
+    ctx.lineWidth=8;
+    ctx.strokeRect(4,4,canvas.width-8,canvas.height-8);
+
+    drawParticles();
+    drawProjectiles();
+    drawMinions();
+
+    if(fighterA) drawFighter(fighterA);
+    if(fighterB) drawFighter(fighterB);
+}
+
+
+/* =========================================================
+   DRAW FIGHTER
+========================================================= */
+
+function drawFighter(f){
+
+    ctx.save();
+
+    let x=f.x;
+    let y=f.y;
+
+    if(f.data.color==="rainbow"){
+
+        const g=ctx.createConicGradient(0,x,y);
+
+        g.addColorStop(0,"#ff3333");
+        g.addColorStop(.2,"#ffe13b");
+        g.addColorStop(.4,"#4be66d");
+        g.addColorStop(.6,"#37d8ff");
+        g.addColorStop(.8,"#7557ff");
+        g.addColorStop(1,"#ff3ebc");
+
+        ctx.fillStyle=g;
+
+    }else{
+
+        ctx.fillStyle=f.data.color;
+
+    }
+
+    // Cyan invisibility
+    if(Date.now() < f.invincibleUntil &&
+       f.data.id===6){
+
+        ctx.globalAlpha=.25;
+    }
+
+    ctx.beginPath();
+    ctx.arc(x,y,f.r,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.globalAlpha=1;
+
+    // shine
+    ctx.fillStyle="#ffffffaa";
+
+    ctx.beginPath();
+    ctx.ellipse(
+        x-f.r*.28,
+        y-f.r*.3,
+        f.r*.28,
+        f.r*.13,
+        -.4,
+        0,
+        Math.PI*2
+    );
+    ctx.fill();
+
+    // weapon
+    drawWeapon(f);
+
+    // HP bar
+    const barW=100;
+
+    ctx.fillStyle="#00000030";
+    ctx.fillRect(x-barW/2,y-f.r-23,barW,9);
+
+    ctx.fillStyle="#ef4568";
+    ctx.fillRect(
+        x-barW/2,
+        y-f.r-23,
+        barW*Math.max(0,f.hp/f.maxHp),
+        9
+    );
+
+    ctx.strokeStyle="#ffffff";
+    ctx.strokeRect(x-barW/2,y-f.r-23,barW,9);
+
+    // stun
+    if(Date.now() < f.stunUntil){
+
+        ctx.strokeStyle="#ffe45b";
+        ctx.lineWidth=5;
+
+        ctx.beginPath();
+        ctx.arc(x,y,f.r+10,0,Math.PI*2);
+        ctx.stroke();
+
+        ctx.fillStyle="#8d6d00";
+        ctx.font="bold 18px Arial";
+        ctx.textAlign="center";
+        ctx.fillText("STUN",x,y-f.r-32);
+    }
+
+    // omni
+    if(Date.now()<f.omniUntil){
+
+        ctx.strokeStyle="#ff8b27";
+        ctx.lineWidth=4;
+
+        ctx.beginPath();
+        ctx.arc(x,y,f.r+15,0,Math.PI*2);
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
+
+/* =========================================================
+   WEAPONS
+========================================================= */
+
+function drawWeapon(f){
+
+    const t=Date.now()/450;
+
+    ctx.save();
+
+    ctx.translate(f.x,f.y);
+    ctx.rotate(t*(f.data.id%2===0?1:-1));
+
+    ctx.font="26px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+
+    ctx.fillText(f.data.weapon,f.r+16,0);
+
+    ctx.restore();
+}
+
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+function burst(x,y,color="#ffffff",count=15){
+
+    for(let i=0;i<count;i++){
+
+        const a=Math.random()*Math.PI*2;
+        const s=Math.random()*5+1;
+
+        particles.push({
+            x,
+            y,
+            vx:Math.cos(a)*s,
+            vy:Math.sin(a)*s,
+            life:400+Math.random()*500,
+            max:900,
+            size:Math.random()*4+2,
+            color
+        });
+    }
+}
+
+function drawParticles(){
+
+    const now=Date.now();
+
+    for(let i=particles.length-1;i>=0;i--){
+
+        const p=particles[i];
+
+        p.x+=p.vx;
+        p.y+=p.vy;
+
+        p.vx*=.97;
+        p.vy*=.97;
+
+        p.life-=16;
+
+        if(p.life<=0){
+
+            particles.splice(i,1);
+            continue;
+        }
+
+        ctx.globalAlpha=p.life/p.max;
+
+        ctx.fillStyle=p.color;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fill();
+    }
+
+    ctx.globalAlpha=1;
+}
+
+
+/* =========================================================
+   PROJECTILES
+========================================================= */
+
+function shootProjectile(owner,angle,damage,size=7,speed=8,color="#222"){
+
+    projectiles.push({
+
+        owner,
+        x:owner.x+Math.cos(angle)*(owner.r+5),
+        y:owner.y+Math.sin(angle)*(owner.r+5),
+
+        vx:Math.cos(angle)*speed,
+        vy:Math.sin(angle)*speed,
+
+        damage,
+        size,
+        color,
+
+        life:1500
+
+    });
+}
+
+function drawProjectiles(){
+
+    for(let i=projectiles.length-1;i>=0;i--){
+
+        const p=projectiles[i];
+
+        p.x+=p.vx;
+        p.y+=p.vy;
+
+        p.life-=16;
+
+        if(
+            p.life<=0 ||
+            p.x<-30 ||
+            p.x>canvas.width+30 ||
+            p.y<-30 ||
+            p.y>canvas.height+30
+        ){
+
+            projectiles.splice(i,1);
+            continue;
+        }
+
+        ctx.fillStyle=p.color;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fill();
+
+        const target=p.owner===fighterA?fighterB:fighterA;
+
+        if(target &&
+           distance(p,target)<target.r+p.size){
+
+            applyDamage(target,p.damage,p.owner,true);
+
+            burst(p.x,p.y,p.color,6);
+
+            projectiles.splice(i,1);
+        }
+    }
+}
+
+
+/* =========================================================
+   MINIONS
+========================================================= */
+
+function summonRainbow(f){
+
+    if(f.data.id!==11) return;
+
+    if(f.summons>=4) return;
+
+    const choices=balls.filter(
+        b=>b.id!==11 && (!b.admin || developerMode)
+    );
+
+    const d=choices[Math.floor(Math.random()*choices.length)];
+
+    const m={
+
+        owner:f,
+
+        x:f.x+(Math.random()*80-40),
+        y:f.y+(Math.random()*80-40),
+
+        vx:(Math.random()>.5?1:-1)*(2+Math.random()*2),
+        vy:(Math.random()>.5?1:-1)*(2+Math.random()*2),
+
+        r:22,
+
+        hp:300,
+
+        damage:d.strength*.35,
+
+        color:d.color,
+
+        stunTime:900,
+
+        life:9000
+
+    };
+
+    minions.push(m);
+
+    f.summons++;
+}
+
+function drawMinions(){
+
+    for(let i=minions.length-1;i>=0;i--){
+
+        const m=minions[i];
+
+        m.x+=m.vx;
+        m.y+=m.vy;
+
+        m.life-=16;
+
+        if(m.life<=0){
+
+            m.owner.summons=Math.max(0,m.owner.summons-1);
+            minions.splice(i,1);
+            continue;
+        }
+
+        if(m.x-m.r<8 || m.x+m.r>canvas.width-8)
+            m.vx*=-1;
+
+        if(m.y-m.r<8 || m.y+m.r>canvas.height-8)
+            m.vy*=-1;
+
+        const g=ctx.createRadialGradient(
+            m.x-5,m.y-5,2,
+            m.x,m.y,m.r
+        );
+
+        if(m.color==="rainbow"){
+            g.addColorStop(0,"#ffffff");
+            g.addColorStop(.3,"#ff55bb");
+            g.addColorStop(.6,"#52eaff");
+            g.addColorStop(1,"#8a58ff");
+        }else{
+            g.addColorStop(0,"#ffffff");
+            g.addColorStop(1,m.color);
+        }
+
+        ctx.fillStyle=g;
+
+        ctx.beginPath();
+        ctx.arc(m.x,m.y,m.r,0,Math.PI*2);
+        ctx.fill();
+
+        const target=m.owner===fighterA?fighterB:fighterA;
+
+        if(target &&
+           distance(m,target)<m.r+target.r){
+
+            applyDamage(target,m.damage,m.owner,false);
+
+            // stun
+            if(Date.now()>target.invincibleUntil){
+
+                target.stunUntil=Date.now()+m.stunTime;
+
+                target.storedVX=target.vx;
+                target.storedVY=target.vy;
+
+                target.vx=0;
+                target.vy=0;
+                target.stunned=true;
+            }
+
+            burst(m.x,m.y,"#b77cff",12);
+
+            m.owner.summons=Math.max(0,m.owner.summons-1);
+
+            minions.splice(i,1);
+        }
+    }
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function distance(a,b){
+
+    return Math.hypot(a.x-b.x,a.y-b.y);
+}
+
+function effectiveStrength(f){
+
+    let s=f.data.strength;
+
+    // Crimson: HP lebih rendah = lebih kuat
+    if(f.data.id===7){
+
+        const missing=1-f.hp/f.maxHp;
+
+        s*=1+missing*.9;
+    }
+
+    // Brown Blazing Age
+    if(f.data.id===12 && Date.now()<f.omniUntil){
+        s*=3.5;
+    }
+
+    return s;
+}
+
+
+/* =========================================================
+   DAMAGE SYSTEM
+========================================================= */
+
+function applyDamage(target,amount,attacker,isProjectile=false){
+
+    if(!target || target.hp<=0) return;
+
+    const now=Date.now();
+
+    // Invincible
+    if(now<target.invincibleUntil){
+
+        // Azure parry masih dapat menerima projectile
+        if(!(target.data.id===2 && isProjectile)){
+            return;
+        }
+    }
+
+    // Rainbow Trapesium
+    if(target.data.id===11 && now<target.omniUntil){
+        return;
+    }
+
+    // Cyan
+    if(target.data.id===6 && now<target.invincibleUntil){
+        return;
+    }
+
+    // White Pure Field
+    if(target.data.id===8 && now<target.skill1Duration){
+
+        if(attacker && attacker.hp>0){
+            attacker.hp-=amount*.4;
+        }
+
+        burst(target.x,target.y,"#ffffff",8);
+
+        return;
+    }
+
+    // Black time stop
+    if(target.data.id===9 &&
+       target.boundUntil>now){
+
+        target.accumulatedDamage+=amount;
+        return;
+    }
+
+    target.hp-=amount;
+
+    shake=Math.min(18,shake+amount*.015);
+
+    burst(target.x,target.y,"#ff6680",8);
+
+    if(target.hp<0) target.hp=0;
+}
+
+
+/* =========================================================
+   WALL BOUNCE
+========================================================= */
+
+function updateFighter(f,now){
+
+    // STUN
+    if(now<f.stunUntil){
+
+        if(!f.stunned){
+
+            f.storedVX=f.vx;
+            f.storedVY=f.vy;
+
+            f.vx=0;
+            f.vy=0;
+
+            f.stunned=true;
+        }
+
+        return;
+    }
+
+    if(f.stunned){
+
+        f.vx=f.storedVX || f.data.speed;
+        f.vy=f.storedVY || -f.data.speed;
+
+        f.stunned=false;
+    }
+
+    // Time stop
+    if(
+        fighterA &&
+        fighterB &&
+        fighterA.data.id===9 &&
+        fighterA.timeStopUntil>now &&
+        f!==fighterA
+    ){
+        return;
+    }
+
+    f.x+=f.vx;
+    f.y+=f.vy;
+
+    let hit=false;
+
+    if(f.x-f.r<8){
+
+        f.x=8+f.r;
+        f.vx=Math.abs(f.vx);
+        hit=true;
+    }
+
+    if(f.x+f.r>canvas.width-8){
+
+        f.x=canvas.width-8-f.r;
+        f.vx=-Math.abs(f.vx);
+        hit=true;
+    }
+
+    if(f.y-f.r<8){
+
+        f.y=8+f.r;
+        f.vy=Math.abs(f.vy);
+        hit=true;
+    }
+
+    if(f.y+f.r>canvas.height-8){
+
+        f.y=canvas.height-8-f.r;
+        f.vy=-Math.abs(f.vy);
+        hit=true;
+    }
+
+    if(hit){
+
+        wallSound();
+
+        burst(
+            f.x,
+            f.y,
+            "#91c9ed",
+            7
+        );
+
+        shake=Math.min(7,shake+1.2);
+    }
+
+    // burn
+    if(now<f.burnUntil){
+
+        f.hp-=f.burnDamage;
+
+        if(Math.random()<.08){
+            burst(f.x,f.y,"#ff682f",3);
+        }
+    }
+
+    // regeneration
+    if(now<f.regenUntil){
+
+        f.hp=Math.min(
+            f.maxHp,
+            f.hp+f.maxHp*f.regenRate
+        );
+    }
+
+    f.attackTimer-=16;
+    f.skill1Timer-=16;
+    f.skill2Timer-=16;
+
+    normalAttack(f,now);
+}
+
+
+/* =========================================================
+   NORMAL ATTACK
+========================================================= */
+
+function normalAttack(f,now){
+
+    if(f.attackTimer>0) return;
+
+    if(now<f.parryUntil) return;
+
+    if(f.data.id===6){
+
+        const arrows=f.arrows || 1;
+
+        for(let i=0;i<arrows;i++){
+
+            let spread=(i-(arrows-1)/2)*.16;
+
+            shootProjectile(
+                f,
+                Math.atan2(fighterTarget(f).y-f.y,
+                           fighterTarget(f).x-f.x)+spread,
+                effectiveStrength(f)*.75,
+                7,
+                10,
+                "#31dff0"
+            );
+        }
+
+        f.attackTimer=850;
+        return;
+    }
+
+    // Brown pistol — omni
+    if(f.data.id===12){
+
+        const count=8;
+
+        for(let i=0;i<count;i++){
+
+            shootProjectile(
+                f,
+                i*Math.PI*2/count,
+                effectiveStrength(f)*.45,
+                Date.now()<f.omniUntil ? 10 : 7,
+                Date.now()<f.omniUntil ? 12 : 9,
+                "#7b381d"
+            );
+        }
+
+        f.attackTimer=850;
+        return;
+    }
+
+    // Orange magic orb
+    if(f.data.id===10){
+
+        const target=fighterTarget(f);
+
+        shootProjectile(
+            f,
+            Math.atan2(target.y-f.y,target.x-f.x),
+            effectiveStrength(f)*1.25,
+            10,
+            7,
+            "#ff8c2e"
+        );
+
+        f.attackTimer=1100;
+        return;
+    }
+
+    // Normal melee
+    f.attackTimer=f.data.cooldown;
+}
+
+function fighterTarget(f){
+    return f===fighterA ? fighterB : fighterA;
+}
+
+
+/* =========================================================
+   COLLISION
+========================================================= */
+
+let collisionLock=0;
+
+function resolveBallCollision(a,b){
+
+    const dx=b.x-a.x;
+    const dy=b.y-a.y;
+
+    const dist=Math.hypot(dx,dy);
+
+    const minDist=a.r+b.r;
+
+    if(dist>=minDist || dist===0) return;
+
+    const nx=dx/dist;
+    const ny=dy/dist;
+
+    // IMPORTANT:
+    // Pisahkan bola terlebih dahulu agar tidak stuck.
+    const overlap=minDist-dist;
+
+    a.x-=nx*overlap*.52;
+    a.y-=ny*overlap*.52;
+
+    b.x+=nx*overlap*.52;
+    b.y+=ny*overlap*.52;
+
+    const rvx=b.vx-a.vx;
+    const rvy=b.vy-a.vy;
+
+    const velAlongNormal=rvx*nx+rvy*ny;
+
+    // Jika sudah menjauh, jangan hitung collision lagi.
+    if(velAlongNormal>0){
+        return;
+    }
+
+    // elastic collision
+    const impulse=-velAlongNormal;
+
+    a.vx-=impulse*nx;
+    a.vy-=impulse*ny;
+
+    b.vx+=impulse*nx;
+    b.vy+=impulse*ny;
+
+    const now=Date.now();
+
+    // suara tetap boleh setiap collision fisik,
+    // damage diberi cooldown supaya tidak spam.
+    collisionSound();
+
+    shake=Math.min(18,shake+7);
+
+    burst(
+        (a.x+b.x)/2,
+        (a.y+b.y)/2,
+        "#ffffff",
+        20
+    );
+
+    if(now>collisionLock){
+
+        collisionLock=now+180;
+
+        if(now>a.parryUntil && now>b.parryUntil){
+
+            applyMeleeDamage(a,b);
+            applyMeleeDamage(b,a);
+        }
+    }
+}
+
+function applyMeleeDamage(attacker,target){
+
+    if(attacker.hp<=0 || target.hp<=0) return;
+
+    // target sedang parry
+    if(Date.now()<target.parryUntil){
+
+        return;
+    }
+
+    let dmg=effectiveStrength(attacker);
+
+    // Ruby / Crimson etc.
+    if(attacker.data.id===1 &&
+       Date.now()<attacker.slashUntil){
+        dmg*=1.5;
+    }
+
+    if(attacker.data.id===7){
+        dmg*=1.5;
+    }
+
+    // Violet slowed target = guaranteed hit
+    if(
+        attacker.data.id===4 &&
+        Date.now()<target.slowUntil
+    ){
+        // langsung lolos physical check
+    }
+
+    applyDamage(target,dmg,attacker,false);
+}
+
+
+/* =========================================================
+   SKILLS
+========================================================= */
+
+function useSkill(f,slot){
+
+    const now=Date.now();
+
+    if(!gameRunning) return;
+
+    if(slot===1 && f.skill1Timer>0) return;
+    if(slot===2 && f.skill2Timer>0) return;
+
+    const id=f.data.id;
+
+    /* ---------------- RUBY ---------------- */
+
+    if(id===1 && slot===1){
+
+        f.skill1Timer=10000;
+
+        f.vx=0;
+        f.vy=0;
+
+        f.invincibleUntil=now+900;
+
+        f.slashUntil=now+900;
+
+        // fire slash across arena
+        const target=fighterTarget(f);
+
+        if(target){
+
+            applyDamage(
+                target,
+                effectiveStrength(f)*1.5,
+                f
+            );
+
+            target.burnUntil=now+2500;
+            target.burnDamage=f.maxHp*.008;
+
+            f.hp=Math.min(
+                f.maxHp,
+                f.hp+f.maxHp*.03
+            );
+        }
+
+        burst(f.x,f.y,"#ff482f",40);
+
+        return;
+    }
+
+
+    /* ---------------- AZURE ---------------- */
+
+    if(id===2 && slot===1){
+
+        f.skill1Timer=12000;
+
+        f.parryUntil=now+1800;
+
+        // cannot attack
+        f.attackTimer=1800;
+
+        burst(f.x,f.y,"#36baff",35);
+
+        return;
+    }
+
+
+    /* ---------------- EMERALD ---------------- */
+
+    if(id===3 && slot===1){
+
+        f.skill1Timer=8000;
+
+        f.invincibleUntil=now+800;
+
+        // 8.7% current HP
+        f.hp=Math.min(
+            f.maxHp,
+            f.hp + f.hp*.087
+        );
+
+        burst(f.x,f.y,"#4df49c",30);
+
+        return;
+    }
+
+
+    /* ---------------- VIOLET ---------------- */
+
+    if(id===4 && slot===1){
+
+        f.skill1Timer=14000;
+
+        for(let i=0;i<5;i++){
+
+            const a=i*Math.PI*2/5;
+
+            minions.push({
+
+                owner:f,
+
+                x:f.x+Math.cos(a)*65,
+                y:f.y+Math.sin(a)*65,
+
+                vx:Math.cos(a)*2.4,
+                vy:Math.sin(a)*2.4,
+
+                r:25,
+
+                hp:300,
+
+                damage:0,
+
+                color:"#6d43b8",
+
+                stunTime:2000,
+
+                life:5000
+
+            });
+        }
+
+        burst(f.x,f.y,"#a16aff",45);
+
+        return;
+    }
+
+
+    /* ---------------- GOLD ---------------- */
+
+    if(id===5 && slot===1){
+
+        f.skill1Timer=15000;
+
+        f.vx=0;
+        f.vy=0;
+
+        const cost=f.hp*.50;
+
+        f.hp=Math.max(1,f.hp-cost);
+
+        f.invincibleUntil=now+2000;
+
+        f.regenUntil=now+2000;
+
+        // approximately 1% max HP per tick
+        f.regenRate=.01;
+
+        const target=fighterTarget(f);
+
+        if(target){
+
+            applyDamage(
+                target,
+                f.maxHp*.50,
+                f
+            );
+
+            target.burnUntil=now+3000;
+            target.burnDamage=f.maxHp*.01;
+        }
+
+        burst(f.x,f.y,"#ffbf31",60);
+
+        return;
+    }
+
+
+    /* ---------------- CYAN ---------------- */
+
+    if(id===6 && slot===1){
+
+        f.skill1Timer=9000;
+
+        f.invincibleUntil=now+2000;
+
+        f.arrows=3;
+
+        setTimeout(()=>{
+
+            if(f){
+                f.arrows=1;
+            }
+
+        },2000);
+
+        burst(f.x,f.y,"#5df8ff",35);
+
+        return;
+    }
+
+
+    /* ---------------- CRIMSON ---------------- */
+
+    if(id===7 && slot===1){
+
+        f.skill1Timer=15000;
+
+        f.vx=0;
+        f.vy=0;
+
+        f.invincibleUntil=now+900;
+
+        const target=fighterTarget(f);
+
+        if(target){
+
+            applyDamage(
+                target,
+                effectiveStrength(f)*1.5,
+                f
+            );
+
+            applyDamage(
+                target,
+                effectiveStrength(f)*1.5,
+                f
+            );
+
+            target.burnUntil=now+3000;
+            target.burnDamage=f.maxHp*.012;
+        }
+
+        burst(f.x,f.y,"#8e1125",50);
+
+        return;
+    }
+
+
+    /* ---------------- WHITE ---------------- */
+
+    if(id===8 && slot===1){
+
+        f.skill1Timer=15000;
+
+        f.skill1Duration=now+3500;
+
+        f.invincibleUntil=now+3500;
+
+        f.stunUntil=0;
+
+        burst(f.x,f.y,"#ffffff",50);
+
+        return;
+    }
+
+
+    /* ---------------- BLACK ---------------- */
+
+    if(id===9 && slot===1){
+
+        f.skill1Timer=18000;
+
+        f.timeStopUntil=now+5000;
+
+        const target=fighterTarget(f);
+
+        if(target){
+
+            target.boundUntil=now+5000;
+
+            target.accumulatedDamage=0;
+
+            target.vx=0;
+            target.vy=0;
+        }
+
+        burst(f.x,f.y,"#252637",60);
+
+        return;
+    }
+
+
+    /* ---------------- ORANGE ---------------- */
+
+    if(id===10 && slot===1){
+
+        f.skill1Timer=16000;
+
+        const target=fighterTarget(f);
+
+        for(let i=0;i<3;i++){
+
+            setTimeout(()=>{
+
+                if(!gameRunning || !target) return;
+
+                const x=
+                    Math.random()*(canvas.width-120)+60;
+
+                const y=
+                    Math.random()*(canvas.height-120)+60;
+
+                const r=f.r*.25;
+
+                // meteor visual
+                burst(x,y,"#ff7c25",45);
+
+                applyDamage(
+                    target,
+                    effectiveStrength(f)*3,
+                    f
+                );
+
+                target.slowUntil=Date.now()+2500;
+                target.stunUntil=Date.now()+1000;
+
+                target.storedVX=target.vx;
+                target.storedVY=target.vy;
+
+                target.vx=0;
+                target.vy=0;
+                target.stunned=true;
+
+            },i*350);
+        }
+
+        return;
+    }
+
+
+    /* ---------------- RAINBOW SKILL 1 ---------------- */
+
+    if(id===11 && slot===1){
+
+        f.skill1Timer=8000;
+
+        for(let i=0;i<4;i++){
+
+            summonRainbow(f);
+        }
+
+        burst(f.x,f.y,"#ff4bd8",50);
+
+        return;
+    }
+
+
+    /* ---------------- RAINBOW SKILL 2 ---------------- */
+
+    if(id===11 && slot===2){
+
+        f.skill2Timer=16000;
+
+        f.omniUntil=now+3000;
+        f.invincibleUntil=now+3000;
+
+        f.regenUntil=now+3000;
+
+        // 0.6% max HP per tick
+        f.regenRate=.006;
+
+        f.slashUntil=now+3000;
+
+        const target=fighterTarget(f);
+
+        if(target){
+
+            applyDamage(
+                target,
+                effectiveStrength(f)*1.4,
+                f
+            );
+        }
+
+        burst(f.x,f.y,"#ff52dd",70);
+
+        return;
+    }
+
+
+    /* ---------------- BROWN ADMIN ---------------- */
+
+    if(id===12 && slot===1){
+
+        f.skill1Timer=14000;
+
+        // 10 seconds
+        f.omniUntil=now+10000;
+
+        // cannot be stunned
+        f.invincibleUntil=now+10000;
+
+        burst(f.x,f.y,"#ff7b2c",70);
+
+        return;
+    }
+
+
+    /* ---------------- BROWN MEGA BOOM ---------------- */
+
+    if(id===12 && slot===2){
+
+        f.skill2Timer=30000;
+
+        const target=fighterTarget(f);
+
+        if(target){
+
+            // massive non-graphic instant KO mechanic
+            target.hp=0;
+
+            burst(target.x,target.y,"#ff8b36",100);
+
+            shake=20;
+        }
+
+        burst(f.x,f.y,"#8a4b24",70);
+
+        return;
+    }
+
+}
+
+
+/* =========================================================
+   COOLDOWNS
+========================================================= */
+
+function cooldownTotal(f,slot){
+
+    const id=f.data.id;
+
+    if(id===11 && slot===1) return 8000;
+    if(id===11 && slot===2) return 16000;
+
+    if(id===12 && slot===1) return 14000;
+    if(id===12 && slot===2) return 30000;
+
+    return f.data.cooldown;
+}
+
+function makeCooldownCard(f,slot,name){
+
+    const cd=document.createElement("div");
+
+    cd.className="cdCard";
+
+    cd.innerHTML=`
+
+        <div class="cdTitle">
+            ${f.data.name} — ${name}
+        </div>
+
+        <div class="bar">
+            <div class="barFill"></div>
+        </div>
+
+        <div class="cdText">
+            READY
+        </div>
+
+    `;
+
+    document.getElementById("cooldowns").appendChild(cd);
+
+    return cd;
+}
+
+let cdElements=[];
+
+function setupCooldowns(){
+
+    const box=document.getElementById("cooldowns");
+
+    box.innerHTML="";
+
+    cdElements=[];
+
+    [fighterA,fighterB].forEach(f=>{
+
+        if(!f) return;
+
+        const c1=makeCooldownCard(
+            f,
+            1,
+            f.data.skill
+        );
+
+        cdElements.push({
+            f,
+            slot:1,
+            element:c1
+        });
+
+        if(f.data.skill2){
+
+            const c2=makeCooldownCard(
+                f,
+                2,
+                f.data.skill2
+            );
+
+            cdElements.push({
+                f,
+                slot:2,
+                element:c2
+            });
+        }
+
+    });
+}
+
+function updateCooldowns(){
+
+    cdElements.forEach(c=>{
+
+        const timer=
+            c.slot===1
+            ? c.f.skill1Timer
+            : c.f.skill2Timer;
+
+        const total=cooldownTotal(c.f,c.slot);
+
+        const progress=Math.max(
+            0,
+            Math.min(1,timer/total)
+        );
+
+        const fill=c.element.querySelector(".barFill");
+        const text=c.element.querySelector(".cdText");
+
+        fill.style.width=(progress*100)+"%";
+
+        text.textContent=
+            timer>0
+            ? (timer/1000).toFixed(1)+"s"
+            : "READY";
+
+    });
+}
+
+
+/* =========================================================
+   BATTLE START
+========================================================= */
+
+function startSelectedBattle(){
+
+    if(gameRunning) return;
+
+    if(!owned.includes(selectedBall)){
+
+        alert("Kamu belum memiliki bola tersebut.");
+        return;
+    }
+
+    let secondId=selectedBall2;
+
+    if(currentMode==="custom"){
+
+        if(!owned.includes(secondId)){
+            alert("Bola kedua belum dimiliki.");
+            return;
+        }
+
+        if(secondId===selectedBall){
+
+            alert("Pilih dua bola yang berbeda.");
+            return;
+        }
+
+    }else{
+
+        const candidates=owned.filter(
+            id=>id!==selectedBall
+        );
+
+        if(candidates.length===0){
+
+            alert("Butuh minimal 2 bola.");
+            return;
+        }
+
+        secondId=
+            candidates[
+                Math.floor(Math.random()*candidates.length)
+            ];
+    }
+
+    // Ranked random bot
+    if(currentMode==="ranked"){
+
+        const candidates=owned.filter(
+            id=>id!==selectedBall
+        );
+
+        secondId=
+            candidates[
+                Math.floor(Math.random()*candidates.length)
+            ];
+
+        document.getElementById("battleTitle").textContent=
+            `🏆 ${rankList[rankIndex].name} — vs BOT`;
+    }
+
+    fighterA=createFighter(
+        selectedBall,
+        170,
+        canvas.height/2
+    );
+
+    fighterB=createFighter(
+        secondId,
+        canvas.width-170,
+        canvas.height/2
+    );
+
+    particles=[];
+    projectiles=[];
+    minions=[];
+
+    gameRunning=true;
+
+    document.getElementById("battleArea").classList.remove("hidden");
+
+    document.getElementById("ballSelection").parentElement.classList.add("hidden");
+
+    playBattleMusic();
+
+    ensureAudio();
+
+    setupCooldowns();
+
+    lastTime=performance.now();
+
+    requestAnimationFrame(gameLoop);
+}
+
+
+/* =========================================================
+   GAME LOOP
+========================================================= */
+
+function gameLoop(time){
+
+    if(!gameRunning) return;
+
+    const now=Date.now();
+
+    updateFighter(fighterA,now);
+    updateFighter(fighterB,now);
+
+    resolveBallCollision(
+        fighterA,
+        fighterB
+    );
+
+    // Skills otomatis random untuk bot
+    botSkill(fighterB,now);
+
+    updateSkillsEffects(now);
+
+    updateCooldowns();
+
+    drawFrame();
+
+    if(fighterA.hp<=0 || fighterB.hp<=0){
+
+        endBattle();
+
+        return;
+    }
+
+    shake*=.86;
+
+    requestAnimationFrame(gameLoop);
+}
+
+
+/* =========================================================
+   BOT SKILLS
+========================================================= */
+
+function botSkill(f,now){
+
+    if(!f) return;
+
+    if(Math.random()<.008){
+
+        if(f.data.skill2 && Math.random()<.25){
+
+            useSkill(f,2);
+
+        }else{
+
+            useSkill(f,1);
+
+        }
+    }
+}
+
+
+/* =========================================================
+   SKILL EFFECTS
+========================================================= */
+
+function updateSkillsEffects(now){
+
+    // Black Time Knull ends
+    if(
+        fighterA &&
+        fighterA.data.id===9 &&
+        fighterA.timeStopUntil>0 &&
+        fighterA.timeStopUntil<=now
+    ){
+
+        const target=fighterB;
+
+        if(target && target.boundUntil>0){
+
+            if(target.accumulatedDamage>0){
+
+                applyDamage(
+                    target,
+                    target.accumulatedDamage,
+                    fighterA
+                );
+            }
+
+            target.accumulatedDamage=0;
+            target.boundUntil=0;
+        }
+
+        fighterA.timeStopUntil=0;
+    }
+
+    if(
+        fighterB &&
+        fighterB.data.id===9 &&
+        fighterB.timeStopUntil>0 &&
+        fighterB.timeStopUntil<=now
+    ){
+
+        const target=fighterA;
+
+        if(target && target.boundUntil>0){
+
+            if(target.accumulatedDamage>0){
+
+                applyDamage(
+                    target,
+                    target.accumulatedDamage,
+                    fighterB
+                );
+            }
+
+            target.accumulatedDamage=0;
+            target.boundUntil=0;
+        }
+
+        fighterB.timeStopUntil=0;
+    }
+
+    // Rainbow slash
+    [fighterA,fighterB].forEach(f=>{
+
+        if(!f) return;
+
+        if(f.data.id===11 && now<f.slashUntil){
+
+            const target=fighterTarget(f);
+
+            if(target){
+
+                applyDamage(
+                    target,
+                    effectiveStrength(f)*.12,
+                    f
+                );
+            }
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   DRAW FRAME
+========================================================= */
+
+function drawFrame(){
+
+    ctx.save();
+
+    if(shake>0){
+
+        ctx.translate(
+            (Math.random()-.5)*shake,
+            (Math.random()-.5)*shake
+        );
+    }
+
+    drawArena();
+
+    ctx.restore();
+
+    // names
+    if(fighterA && fighterB){
+
+        ctx.fillStyle="#172033";
+        ctx.font="bold 15px Arial";
+        ctx.textAlign="left";
+
+        ctx.fillText(
+            fighterA.data.name,
+            18,
+            28
+        );
+
+        ctx.textAlign="right";
+
+        ctx.fillText(
+            fighterB.data.name,
+            canvas.width-18,
+            28
+        );
+    }
+}
+
+
+/* =========================================================
+   END BATTLE
+========================================================= */
+
+function endBattle(){
+
+    if(!gameRunning) return;
+
+    gameRunning=false;
+
+    const result=document.getElementById("result");
+
+    let winner=null;
+
+    if(fighterA.hp>fighterB.hp){
+
+        winner=fighterA;
+
+    }else if(fighterB.hp>fighterA.hp){
+
+        winner=fighterB;
+    }
+
+    if(!winner){
+
+        result.textContent="🤝 DRAW";
+        drawSound();
+
+    }else if(winner===fighterA){
+
+        result.textContent=
+            `🏆 ${fighterA.data.name} MENANG!`;
+
+        winSound();
+
+        if(currentMode==="predict"){
+            coins+=50;
+        }
+
+        if(currentMode==="ranked"){
+            rankedWin();
+        }
+
+    }else{
+
+        result.textContent=
+            `💥 ${fighterB.data.name} MENANG!`;
+
+        loseSound();
+
+        if(currentMode==="ranked"){
+            rankedLose();
+        }
+    }
+
+    save();
+    updateMoney();
+
+    playMenuMusic();
+}
+
+function stopBattle(){
+
+    if(gameRunning){
+
+        gameRunning=false;
+
+        drawSound();
+    }
+
+    document.getElementById("battleArea").classList.add("hidden");
+
+    document
+        .getElementById("ballSelection")
+        .parentElement
+        .classList.remove("hidden");
+
+    document.getElementById("result").textContent="";
+
+    playMenuMusic();
+}
+
+
+/* =========================================================
+   ADMIN MODE
+========================================================= */
+
+let adminBuffer="";
+
+document.addEventListener("keydown",e=>{
+
+    adminBuffer+=e.key.toUpperCase();
+
+    if(adminBuffer.length>10){
+        adminBuffer=adminBuffer.slice(-10);
+    }
+
+    if(adminBuffer.includes("4DM1N")){
+
+        enableAdmin();
+
+        adminBuffer="";
+    }
+
+    if(adminBuffer.includes("B3CK")){
+
+        backNormal();
+
+        adminBuffer="";
+    }
+
+});
+
+function enableAdmin(){
+
+    developerMode=true;
+
+    document.getElementById("adminPanel")
+        .classList.add("show");
+
+    owned=balls.map(b=>b.id);
+
+    coins=9999999;
+    diamonds=9999999;
+
+    updateMoney();
+
+    renderBallCards();
+    renderShop();
+    renderCollection();
+
+    alert("👑 Developer Mode aktif!");
+}
+
+function applyAdmin(){
+
+    const c=
+        Number(document.getElementById("adminCoins").value);
+
+    const d=
+        Number(document.getElementById("adminDiamonds").value);
+
+    if(!Number.isNaN(c)) coins=c;
+    if(!Number.isNaN(d)) diamonds=d;
+
+    owned=balls.map(b=>b.id);
+
+    updateMoney();
+    save();
+
+    renderBallCards();
+    renderShop();
+    renderCollection();
+
+    alert("Developer data diterapkan.");
+}
+
+function backNormal(){
+
+    developerMode=false;
+
+    coins=100;
+    diamonds=0;
+
+    owned=[1,2,3];
+
+    balls=structuredClone(BASE_BALLS);
+
+    document.getElementById("adminPanel")
+        .classList.remove("show");
+
+    updateMoney();
+
+    save();
+
+    renderBallCards();
+    renderShop();
+    renderCollection();
+
+    alert(
+        "B3CK berhasil.\n" +
+        "Coins = 100\n" +
+        "Diamonds = 0\n" +
+        "Hanya 3 bola default yang terbuka."
+    );
+
+    showPage("home");
+}
+
+
+/* =========================================================
+   KEYBOARD SKILL
+   1 = PLAYER SKILL 1
+   2 = PLAYER SKILL 2
+========================================================= */
+
+document.addEventListener("keydown",e=>{
+
+    if(e.key==="1"){
+        useSkill(fighterA,1);
+    }
+
+    if(e.key==="2"){
+        useSkill(fighterA,2);
+    }
+
+});
+
+
+/* =========================================================
+   CLICK / TOUCH SKILL BUTTONS
+========================================================= */
+
+const skillButtons=document.createElement("div");
+
+skillButtons.style.cssText=`
+position:fixed;
+right:18px;
+bottom:18px;
+z-index:100;
+display:flex;
+gap:8px;
+`;
+
+skillButtons.innerHTML=`
+<button class="bigBtn" id="skillBtn1">⚡ Skill 1</button>
+<button class="bigBtn" id="skillBtn2">⚡ Skill 2</button>
+`;
+
+document.body.appendChild(skillButtons);
+
+document.getElementById("skillBtn1").onclick=()=>{
+    useSkill(fighterA,1);
+};
+
+document.getElementById("skillBtn2").onclick=()=>{
+    useSkill(fighterA,2);
+};
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+load();
+
+updateRankUI();
+
+renderShop();
+
+renderCollection();
+
+renderBallCards();
+
+document.addEventListener(
+    "pointerdown",
+    ()=>{
+        initMusic();
+        ensureAudio();
+    },
+    {once:true}
+);
+
+</script>
+
+</body>
+</html>
